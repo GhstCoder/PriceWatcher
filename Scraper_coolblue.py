@@ -3,8 +3,7 @@ import requests
 from bs4 import BeautifulSoup as soup
 
 def scrape(url):
-
-
+	
 	product_categorie = url[(url.find('producttype:')+12):]
 	filename = "producten.csv"
 	f = open(filename, "a")
