@@ -3,7 +3,6 @@
 # we use this module for aquiring the webpage
 from urllib.request import urlopen as uReq
 import urllib.error
-import csv
 # this module makes it easier to retrieve data out of the webpage
 from bs4 import BeautifulSoup as soup
 
