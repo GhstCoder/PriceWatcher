@@ -10,8 +10,11 @@ f.write(headers)
 
 #Array met te scrapen links
 allLinks = ['https://www.alternate.be/Hardware/Processoren/Intel',
-'https://www.alternate.be/Hardware/Processoren/AMD']
-brands = ['Intel', 'AMD']
+'https://www.alternate.be/Hardware/Processoren/AMD',
+'https://www.alternate.be/Beeld-Geluid/Monitoren/Alle-monitoren',
+'https://www.alternate.be/Hardware/Harde-schijven-intern/SATA',
+'https://www.alternate.be/Hardware/SSDs/Alle-SSDs']
+brands = ['CPU - Intel', 'CPU - AMD', 'Monitoren', 'HDD - Intern', 'SSD']
 
 for j in range(len(allLinks)):
 
@@ -60,13 +63,46 @@ for j in range(len(allLinks)):
             newContainers = newPage_soup.findAll('div', {'class':'techData'})
             details = newContainers[0].findAll('td', {'class':'c4'})
 
-            EAN = details[1].text
-            fabrikantCode = details[2].text
+            #switch-like proces om informatie op juiste plaats op te halen
+            if (j == 0) or (j == 1):
+                EAN = details[1].text
+                fabrikantCode = details[2].text
+                #Als EAN niet bestaat, maak leeg en lees juiste waarde fabrikantCode in
+                if any(c.isalpha() for c in EAN) == True:
+                    EAN = ''
+                    fabrikantCode = details[1].text
+            elif (j == 2):
+                #Zoek voor EAN en fabrikantCode
+                k = 0
+                while True:
+                    EAN = details[k].text
+                    fabrikantCode = details[k+1].text
+                    k += 1
+                    if any(c.isalpha() for c in EAN) == False:
+                        break
+            elif (j == 3):
+                EAN = details[1].text
+                fabrikantCode = details[2].text
+                if any(c.isalpha() for c in EAN) == True:
+                    EAN = ''
+                    fabrikantCode = details[1].text
+                #fabrikantcode staat in naam als 'inch' als fabrikantcode werd gegeven
+                if 'inch' in fabrikantCode:
+                    fabrikantCode = productName.split()
+                    if 'TB' in fabrikantCode[0]:
+                        fabrikantCode = fabrikantCode[1]
+                    else:
+                        fabrikantCode = fabrikantCode[0]
+            elif (j == 4):
+                try:
+                    EAN = details[1].text
+                    fabrikantCode = details[2].text
+                    if any(c.isalpha() for c in EAN) == True:
+                        EAN = details[2].text
+                        fabrikantCode = details[3].text
 
-            #Als EAN niet bestaat, maak leeg en lees juiste waarde fabrikantCode in
-            if any(c.isalpha() for c in EAN) == True:
-                EAN = ''
-                fabrikantCode = details[1].text
+                except IndexError:
+                    "skipped"
 
             #Schrijven naar file
             f.write(productName + ";" +  EAN + ";" + fabrikantCode + ";" + price + ";" + productUrl +"\n")
